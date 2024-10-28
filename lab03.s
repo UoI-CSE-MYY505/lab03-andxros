@@ -123,7 +123,7 @@ loop_column:
     or   t2, t2, t3        # RED_565 + GREEN_565
         
         # -- 2nd part --
-    srli t4, t4, 3      # shift BLUE to right 3 times so you remove 3 LSBs
+    srli t4, t4, 3      # shift BLUE to remove 3 LSBs
     or  t2, t2, t4      # (RED_565 + GREEN_565) + BLUE_565
     
     # -- saving converted bytes to memory --
