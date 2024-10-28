@@ -100,7 +100,45 @@ outShowRowLoop:
 rgb888_to_rgb565:
 # ----------------------------------------
 # Write your code here.
-# You may move the "return" instruction (jalr zero, ra, 0).
+    add t0, zero, zero
+loop_row:
+        bge t0, a2, out_rgb888_to_rgb565
+        add t1, zero, zero
+loop_column:    
+    beq  t1, a1, out_loop_column
+    
+    # -- getting rgb888 colors --
+    lbu  t2, 0(a0) # get RED from rgb888 
+    lbu  t3, 1(a0) # get GREEN from rgb888
+    lbu  t4, 2(a0) # get BLUE from rgb888
+    
+    # -- converting rgb888 to rgb565 --
+        # -- 1st part --
+    andi t2, t2, 0xf8      # clear 3 LSBs of RED
+    slli t2, t2, 8         # shift RED to RED_565 position
+
+    andi t3, t3, 0xfc      # clear 2 LSBs of GREEN
+    slli t3, t3, 3         # shift GREEN to GREEN_565 position
+    
+    or   t2, t2, t3        # RED_565 + GREEN_565
+        
+        # -- 2nd part --
+    srli t4, t4, 3      # shift BLUE to right 3 times so you remove 3 LSBs
+    or  t2, t2, t4      # (RED_565 + GREEN_565) + BLUE_565
+    
+    # -- saving converted bytes to memory --
+    sh   t2, 0(a3)
+    
+    # -- getting ready for the next loop --
+    addi a0, a0, 3
+    addi a3, a3, 2
+    addi t1, t1, 1
+    j loop_column
+    
+out_loop_column: 
+    addi t0, t0, 1
+    j loop_row
+out_rgb888_to_rgb565:            
     jalr zero, ra, 0
 
 
